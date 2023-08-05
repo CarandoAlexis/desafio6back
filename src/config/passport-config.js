@@ -3,9 +3,9 @@ import userModel from "../dao/models/user.model.js";
 import { Strategy as GitHubStrategy } from "passport-github2";
 import { Strategy as LocalStrategy } from "passport-local";
 
-// Configuro la autenticacion local
+
 const initializePassport = () =>{
- 
+ // Configuro la autenticacion local
   passport.use(
     "local",
     new LocalStrategy(async (email, password, done) => {
@@ -40,7 +40,7 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        console.log("PROFILE INFO ******", profile);
+        console.log("Info de perfil", profile);
         let user = await userModel.findOne({ email: profile._json?.email });
         if (!user) {
           let addNewUser = {

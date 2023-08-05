@@ -8,7 +8,7 @@ const router = Router();
 
 router.post("/register", async (req, res) => {
   try {
-    console.log("BODY ****", req.body);
+    console.log("Body", req.body);
     const { first_name, last_name, email, age, password } = req.body;
 
     const pswHashed = await createHashValue(password);
@@ -23,56 +23,16 @@ router.post("/register", async (req, res) => {
     };
     const newUser = await userModel.create(userAdd);
     console.log(
-      "🚀 ~ file: session.routes.js:61 ~ router.post ~ newUser:",
+      "newUser:",
       newUser
     );
 
     req.session.user = { email, first_name, last_name, age };
     return res.render(`login`);
   } catch (error) {
-    console.log(
-      "🚀 ~ file: session.routes.js:36 ~ router.post ~ error:",
-      error
-    );
   }
 });
-/*
-router.post("/register", async (req, res) => {
-  try {
-    const body = req.body;
 
-    // Verifica si el correo electrónico ya existe en la base de datos
-    const existingUser = await userModel.findOne({ email: body.email });
-
-    if (existingUser) {
-      // Si el correo electrónico ya existe, envia un mensaje de error
-      return res.redirect("/register?error=El correo electrónico ya está registrado");
-    }
-
-    // Verifica si el usuario a registrar es el administrador
-    const isAdmin = body.email === "adminCoder@coder.com" && body.password === "adminCod3r123";
-
-    // Hashea la contraseña antes de guardarla en la base de datos
-    const pswHashed = await createHashValue(body.password);
-
-    // Agrega el rol "admin" si es el administrador, de lo contrario, agrega "usuario"
-    const newUser = await userModel.create({
-      ...body,
-      password: pswHashed, // Guarda la contraseña hasheada en la base de datos
-      role: isAdmin ? "admin" : "usuario",
-    });
-
-    console.log("nuevo usuario:", newUser);
-
-    req.session.user = { ...newUser.toObject() };
-    return res.redirect("/login");
-  } catch (error) {
-    console.log("error:", error);
-    
-    res.status(500).json({ message: "Error al registrar el usuario" });
-  }
-});
-*/
 router.post("/login", async (req, res) => {
   try {
     // Para validar el login con email y contraseña
@@ -140,7 +100,7 @@ router.get(
   "/github",
   passport.authenticate("github"),
   async (req, res) => {
-    console.log(`****** USANBO ENDPOINT CON STRATEGIA DE GITHUB *****`);
+    console.log("endpoint estrategia github");
   }
 );
 
@@ -150,33 +110,24 @@ router.get(
   passport.authenticate("github", { failureRedirect: "/login" }),
   async (req, res) => {
     try {
-      // La autenticación con GitHub ha sido exitosa.
-      // Aquí obtienes los datos del usuario autenticado a través de req.user
       const githubUser = req.user;
-
       // Verifica si el usuario existe en la base de datos a través del githubId
       let findUser = await userModel.findOne({ githubId: githubUser.id });
-
       if (!findUser) {
         // Si el usuario no existe en la base de datos, crea uno nuevo con los datos de GitHub
         findUser = await userModel.create({
           githubId: githubUser.id,
           username: githubUser.username,
-          // Puedes agregar más información del perfil de GitHub que desees guardar en la base de datos.
         });
       }
-
       // Establece la sesión del usuario
       req.session.user = {
         ...findUser.toObject(),
         password: "",
       };
-
       console.log("Usuario establecido en la sesión:", req.session.user);
-
       // Para obtener todos los productos
       const products = await Product.find().lean();
-
       // Renderiza la vista de perfil con los datos del usuario y los productos
       return res.render("profile", {
         role: findUser.role,
