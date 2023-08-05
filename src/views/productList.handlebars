@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Lista de productos</title>
+</head>
+<body>
+  <h1>Lista de productos</h1>
+
+  {{#if user}}
+    <p>Bienvenido, {{user.first_name}} {{user.last_name}}!</p>
+    <p>Edad: {{user.age}}</p>
+    <p>Email: {{user.email}}</p>
+  {{else}}
+    <p>¡Bienvenido, visitante!</p>
+  {{/if}}
+
+  <ul>
+    {{#each products}}
+    <li>
+      <h2>{{title}}</h2>
+      <p>{{description}}</p>
+      <p>Precio: {{price}}</p>
+      <p>Código: {{code}}</p>
+      <p>Categoria: {{category}}</p>
+    </li>
+    {{/each}}
+  </ul>
+</body>
+</html>
